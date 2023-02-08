@@ -10,28 +10,40 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+  "flag"
+  "strings"
+
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/robfig/cron/v3"
-	"github.com/zjyl1994/livetv/global"
-	"github.com/zjyl1994/livetv/route"
-	"github.com/zjyl1994/livetv/service"
+	"github.com/lm317379829/livetv/global"
+	"github.com/lm317379829/livetv/route"
+	"github.com/lm317379829/livetv/service"
 )
 
 func main() {
+  Dir := flag.String("DIR","/etc","路径")
+  Url := flag.String("URL","0.0.0.0","IP")
+  Port := flag.String("PORT","9000","端口号")
+  flag.Parse()
+  var LIVETV_LISTEN string = *Url + ":" + *Port
+  var LIVETV_DATADIR string = *Dir
+    if strings.HasSuffix(LIVETV_DATADIR, "/") {
+    LIVETV_DATADIR = LIVETV_DATADIR[:len(LIVETV_DATADIR)-1]
+  }
 	rand.Seed(time.Now().UnixNano())
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	log.Println("Server listen", os.Getenv("LIVETV_LISTEN"))
-	log.Println("Server datadir", os.Getenv("LIVETV_DATADIR"))
-	logFile, err := os.OpenFile(os.Getenv("LIVETV_DATADIR")+"/livetv.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	log.Println("Server listen", LIVETV_LISTEN)
+	log.Println("Server datadir", LIVETV_DATADIR)
+	logFile, err := os.OpenFile(LIVETV_DATADIR+"/livetv.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		log.Panicln(err)
 	}
 	log.SetOutput(io.MultiWriter(os.Stderr, logFile))
-	err = global.InitDB(os.Getenv("LIVETV_DATADIR") + "/livetv.db")
+	err = global.InitDB(LIVETV_DATADIR + "/livetv.db")
 	if err != nil {
 		log.Panicf("init: %s\n", err)
 	}
@@ -54,7 +66,7 @@ func main() {
 	router.Static("/assert", "./assert")
 	route.Register(router)
 	srv := &http.Server{
-		Addr:    os.Getenv("LIVETV_LISTEN"),
+		Addr:    LIVETV_LISTEN,
 		Handler: router,
 	}
 	go func() {
