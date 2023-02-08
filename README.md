@@ -3,9 +3,13 @@
 
 ## 安装方法
 
+下载对应livetv二进制文件与youtube文件，赋予权限后执行以下命令
+
 install youtube /usr/local/bin/youtube
 
 ## 使用方法
+
+./livetv -DIR /etc -PORT 9000 -URL 0.0.0.0
 
 参数：
 
