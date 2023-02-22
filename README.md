@@ -3,9 +3,11 @@
 
 ## 安装方法
 
-下载对应livetv二进制文件与youtube文件，赋予权限后执行以下命令
+下载对应livetv二进制文件、assert目录、view目录与youtube文件，赋予权限后执行以下命令
 
 install youtube /usr/local/bin/youtube
+
+将assert目录与view目录与livetv放置在同一路径下。
 
 ## 使用方法
 
